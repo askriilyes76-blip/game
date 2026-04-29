@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Game Pro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .score {
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background: #34495e;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card.open {
+      background: #2ecc71;
+    }
+
+    .card.matched {
+      background: #27ae60;
+      cursor: default;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #e67e22;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #d35400;
+    }
+.container img {
+  width: 200px;
+  margin-right: 15%;
+  border-radius: 15px;
+  box-shadow: 0px 10px 30px #d35400;
+  transition: 0.5s ease;
+  animation: zoomOut 3s infinite alternate;
+}
+@keyframes zoomOut {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+.text {
+  margin-top: 20px;
+  font-size: 22px;
+  color: white;
+  opacity: 0;
+  animation: fadeIn 3s forwards;
+  margin-right: 15%;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  </style>
+</head>
+<body>
+<div class="container">
+  <img src="images (1).png" alt="logo">
+  <div class="text">Game de ilyes et moataz</div>
+</div>
+<div class="container">
+  <h1>🧠 ILYES GAME</h1>
+  <div class="score">Score: <span id="score">0</span></div>
+  <div class="game-board" id="board"></div>
+  <button onclick="restartGame()">Restart</button>
+</div>
+
+<script>
+  const symbols = ["🍎","🍎","🚀","🚀","🎮","🎮","🐱","🐱","⚽","⚽","🔥","🔥","💎","💎","🎧","🎧"];
+
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let score = 0;
+
+  const board = document.getElementById("board");
+  const scoreDisplay = document.getElementById("score");
+
+  function shuffle(array) {
+    return array.sort(() => 0.5 - Math.random());
+  }
+
+  function createBoard() {
+    board.innerHTML = "";
+    const shuffled = shuffle(symbols);
+
+    shuffled.forEach(symbol => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.dataset.value = symbol;
+      card.innerHTML = "";
+
+      card.addEventListener("click", () => flipCard(card));
+
+      board.appendChild(card);
+    });
+  }
+
+  function flipCard(card) {
+    if (lockBoard || card.classList.contains("open") || card.classList.contains("matched")) return;
+
+    card.classList.add("open");
+    card.innerHTML = card.dataset.value;
+
+    if (!firstCard) {
+      firstCard = card;
+      return;
+    }
+
+    secondCard = card;
+    checkMatch();
+  }
+
+  function checkMatch() {
+    if (firstCard.dataset.value === secondCard.dataset.value) {
+      firstCard.classList.add("matched");
+      secondCard.classList.add("matched");
+
+      score++;
+      scoreDisplay.textContent = score;
+
+      resetCards();
+    } else {
+      lockBoard = true;
+
+      setTimeout(() => {
+        firstCard.classList.remove("open");
+        secondCard.classList.remove("open");
+
+        firstCard.innerHTML = "";
+        secondCard.innerHTML = "";
+
+        resetCards();
+      }, 800);
+    }
+  }
+
+  function resetCards() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+  }
+
+  function restartGame() {
+    score = 0;
+    scoreDisplay.textContent = score;
+    resetCards();
+    createBoard();
+  }
+
+  createBoard();
+</script>
+
+</body>
+</html>
